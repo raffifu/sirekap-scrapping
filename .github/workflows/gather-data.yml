@@ -9,7 +9,6 @@ jobs:
   gather-data:
     permissions:                # Job-level permissions configuration starts here
       contents: write           # 'write' access to repository contents
-      pull-requests: write      # 'write' access to pull requests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
