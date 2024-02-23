@@ -44,7 +44,7 @@ def parse_tps(kode, info, table):
         row_str += f"{info[0]};{info[1]};TPS-{key[-3:]};"
 
         if len(table[key]) > 3:
-            row_str += f"{";".join(list(map(str, list(table[key].values())[:-3])))}\n"
+            row_str += f"{';'.join(list(map(str, list(table[key].values())[:-3])))}\n"
             continue
 
         row_str += f"Data sedang diproses lihat C1 di: https://pemilu2024.kpu.go.id/pilegdprd_prov/hitung-suara/wilayah/33/{kode[0]}/{kode[1]}/{kode[2]}/{key}\n"
