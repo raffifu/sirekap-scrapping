@@ -4,17 +4,28 @@ import itertools
 import asyncio
 import os
 
+
 async def fetch_desa(kode, client):
-    print(f"Fetch: https://sirekap-obj-data.kpu.go.id/pemilu/hhcw/pdprdp/33/{kode[0]}/{kode[1]}/{kode[2]}.json")
-    response = await client.get(f"https://sirekap-obj-data.kpu.go.id/pemilu/hhcw/pdprdp/33/{kode[0]}/{kode[1]}/{kode[2]}.json")
+    print(
+        f"Fetch: https://sirekap-obj-data.kpu.go.id/pemilu/hhcw/pdprdp/33/{kode[0]}/{kode[1]}/{kode[2]}.json"
+    )
+    response = await client.get(
+        f"https://sirekap-obj-data.kpu.go.id/pemilu/hhcw/pdprdp/33/{kode[0]}/{kode[1]}/{kode[2]}.json",
+        headers={"Referer": "https://pemilu2024.kpu.go.id/"},
+    )
     j_resp = response.json()
 
     return j_resp
 
+
 async def fetch_all_desa(kode):
     async with httpx.AsyncClient(timeout=60) as client:
         return await asyncio.gather(
-            *map(fetch_desa, kode, itertools.repeat(client),)
+            *map(
+                fetch_desa,
+                kode,
+                itertools.repeat(client),
+            )
         )
 
 
@@ -35,8 +46,9 @@ def generate_payload(kabupaten):
 
                     kode.append([kec_kode[0:4], kec_kode, desa_kode])
                     info.append([kec_name, desa_name])
-    
+
     return kode, info
+
 
 def parse_tps(kode, info, table):
     row_str = ""
@@ -51,6 +63,7 @@ def parse_tps(kode, info, table):
 
     return row_str
 
+
 def data_kab(kabupaten, output_path):
     kode, info = generate_payload(kabupaten)
 
@@ -58,13 +71,20 @@ def data_kab(kabupaten, output_path):
     result = loop.run_until_complete(fetch_all_desa(kode))
 
     with open(f"{output_path}/{kabupaten}.csv", "w") as f:
-        f.write("Kecamatan;Desa/Kelurahan;TPS;1 PKB;2 Gerindra;3 PDIP;4 Golkar;5 Nasdem;6 Buruh;7 Gelora;8 PKS;9 PKN;10 Hanura;11 Garuda;12 PAN;13 PBB;14 Demokrat;15 PSI;16 Perindo;17 PPP;24 Umat\n")
+        f.write(
+            "Kecamatan;Desa/Kelurahan;TPS;1 PKB;2 Gerindra;3 PDIP;4 Golkar;5 Nasdem;6 Buruh;7 Gelora;8 PKS;9 PKN;10 Hanura;11 Garuda;12 PAN;13 PBB;14 Demokrat;15 PSI;16 Perindo;17 PPP;24 Umat\n"
+        )
         for i in range(len(kode)):
-            f.write(parse_tps(kode[i], info[i], result[i]['table']))
+            f.write(parse_tps(kode[i], info[i], result[i]["table"]))
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Gather Data from sirekap kpu')
-    parser.add_argument('--output', help='Folder output for csv file (default: result).', default='result')
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Gather Data from sirekap kpu")
+    parser.add_argument(
+        "--output",
+        help="Folder output for csv file (default: result).",
+        default="result",
+    )
 
     args = parser.parse_args()
 
